@@ -1,5 +1,9 @@
 # assload [![Build Status](https://drone.io/github.com/gitsubio/assload/status.png)](https://drone.io/github.com/gitsubio/assload/latest) [![devDependency Status](https://david-dm.org/gitsubio/assload/dev-status.svg?style=flat-square)](https://david-dm.org/gitsubio/assload#info=devDependencies)
 
+<center>
+  ![Assload](http://i.imgur.com/9DCd9dD.jpg)
+</center>
+
 Modular, extensible asset manager with preloading capabilities.
 
 **NOTE:** This is experimental software; use at your own risk. (And please [report issues](http://github.com/gitsubio/assload/issues))
