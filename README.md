@@ -1,8 +1,8 @@
-# assload [![Build Status](https://drone.io/github.com/gitsubio/assload/status.png)](https://drone.io/github.com/gitsubio/assload/latest) [![dependency Status](https://david-dm.org/gitsubio/assload/status.svg?style=flat-square)](https://david-dm.org/gitsubio/assload#info=dependencies) [![devDependency Status](https://david-dm.org/gitsubio/assload/dev-status.svg?style=flat-square)](https://david-dm.org/gitsubio/assload#info=devDependencies)
-
 <center>
   ![Assload](http://i.imgur.com/9DCd9dD.jpg)
 </center>
+
+# assload [![Build Status](https://drone.io/github.com/gitsubio/assload/status.png)](https://drone.io/github.com/gitsubio/assload/latest) [![dependency Status](https://david-dm.org/gitsubio/assload/status.svg?style=flat-square)](https://david-dm.org/gitsubio/assload#info=dependencies) [![devDependency Status](https://david-dm.org/gitsubio/assload/dev-status.svg?style=flat-square)](https://david-dm.org/gitsubio/assload#info=devDependencies)
 
 Modular, extensible asset manager with preloading capabilities.
 
