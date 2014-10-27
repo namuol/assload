@@ -64,8 +64,8 @@ essentials.load().then(function () {
   // mainLoop() or whatever you use...
 
   // ...and now load our music in the background
-  backgroundMusic.load();
-}).then(function () {
+  return backgroundMusic.load();
+}).done(function () {
   // Now the background music has loaded, go ahead and play it:
   assets.music.level1.play();
 }).catch(function (err) {
