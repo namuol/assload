@@ -75,12 +75,8 @@
       return AssetBundle;
 
     })(EventEmitter);
-    AssetManager = (function(_super) {
-      __extends(AssetManager, _super);
-
-      function AssetManager() {
-        return AssetManager.__super__.constructor.apply(this, arguments);
-      }
+    AssetManager = (function() {
+      function AssetManager() {}
 
       AssetManager.prototype.use = function(_loaders) {
         var loader, type;
@@ -95,17 +91,13 @@
         return this;
       };
 
-      AssetManager.prototype.load = function(allAssets) {
-        return load(this, allAssets);
-      };
-
       AssetManager.prototype.bundle = function(allAssets) {
         return new AssetBundle(allAssets);
       };
 
       return AssetManager;
 
-    })(EventEmitter);
+    })();
     loaders = {};
     manager = new AssetManager;
     return manager;

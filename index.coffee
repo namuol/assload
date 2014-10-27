@@ -49,7 +49,7 @@ assload = ->
     load: ->
       load @, @allAssets
 
-  class AssetManager extends EventEmitter
+  class AssetManager
     use: (_loaders) ->
       for own type,loader of _loaders
         loaders[type] = loader
@@ -57,9 +57,6 @@ assload = ->
 
       return @
 
-    load: (allAssets) ->
-      load @, allAssets
-    
     bundle: (allAssets) ->
       return new AssetBundle allAssets
 

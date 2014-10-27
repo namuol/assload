@@ -15,14 +15,14 @@ describe 'assload', (it) ->
     t.true typeof assload is 'function'
     t.end()
 
-  it 'should return an object that has .load defined', (t) ->
+  it 'should return an object that has .bundle defined', (t) ->
     assets = assload()
-    t.true typeof assets?.load is 'function'
+    t.true typeof assets?.bundle is 'function'
     t.end()
 
-  it 'should return a promise when .load is called', (t) ->
+  it 'should return a promise when bundle().load is called', (t) ->
     assets = assload()
-    t.true Q.isPromise assets.load()
+    t.true Q.isPromise assets.bundle().load()
     t.end()
 
   it 'should fail when attempting to load unspecified asset types', (t) ->
@@ -30,10 +30,10 @@ describe 'assload', (it) ->
     
     failed = false
 
-    assets.load
+    assets.bundle
       unspecified:
         test: 'unspecified'
-    .fail (err) ->
+    .load().catch (err) ->
       failed = true
     .fin ->  
       t.true failed
@@ -49,9 +49,10 @@ describe 'assload', (it) ->
       custom: (name, resolve) ->
         resolve data[name]
     
-    assets.load
+    assets.bundle
       custom:
         test: 'test'
+    .load()
     .fin ->
       t.equal assets.custom.test, data.test
       t.end()
@@ -68,11 +69,12 @@ describe 'assload', (it) ->
       custom: (name, resolve) ->
         resolve data[name]
     
-    assets.load
+    assets.bundle
       custom:
         a: 'a.custom'
         b: 'b.custom'
         c: 'c.custom'
+    .load()
     .fin ->
       t.deepEqual assets.custom,
         a: 'AAA'
@@ -95,8 +97,14 @@ describe 'assload', (it) ->
     complete = 0
     
     notLoaded = ['a', 'b', 'c']
+
+    bundle = assets.bundle
+      custom:
+        a: 'a.custom'
+        b: 'b.custom'
+        c: 'c.custom'
     
-    assets.on 'asset.complete', (info) ->
+    bundle.on 'asset.complete', (info) ->
       complete += 1
       
       t.equal info.type, 'custom'
@@ -105,11 +113,7 @@ describe 'assload', (it) ->
 
       notLoaded = _.without notLoaded, info.name
 
-    assets.load
-      custom:
-        a: 'a.custom'
-        b: 'b.custom'
-        c: 'c.custom'
+    bundle.load()
     .fin ->
       t.equal notLoaded.length, 0
       t.end()
@@ -126,17 +130,23 @@ describe 'assload', (it) ->
 
     assets.use
       custom: (name, resolve, reject, notify) ->
-        for i in [1...10]
+        for i in [1...3]
           do (i) ->
             setTimeout ->
-              notify i / 10
+              notify i / 3
             , i
 
         setTimeout ->
           resolve data[name]
-        , 11
+        , 4
     
-    assets.on 'asset.progress', (info) ->
+    bundle = assets.bundle
+      custom:
+        a: 'a.custom'
+        b: 'b.custom'
+        c: 'c.custom'
+
+    bundle.on 'asset.progress', (info) ->
       t.true info.amount >= 0
       t.equal info.type, 'custom'
       t.true info.name in notLoaded
@@ -145,42 +155,6 @@ describe 'assload', (it) ->
       if info.amount >= 1
         notLoaded = _.without notLoaded, info.name
 
-    assets.load
-      custom:
-        a: 'a.custom'
-        b: 'b.custom'
-        c: 'c.custom'
-    .fin ->
-      t.end()
-
-  it 'should allow bundles to be loaded independently from the same manager', (t) ->
-    assets = assload()
-
-    data =
-      'a.custom': 'AAA'
-      'b.custom': 'BBB'
-
-    assets.use
-      custom: (name, resolve, reject) ->
-        resolve data[name]
-    
-    complete = 0
-
-    bundleA = assets.bundle
-      custom:
-        a: 'a.custom'
-
-    bundleB = assets.bundle
-      custom:
-        b: 'b.custom'
-
-    bundleA.load().then ->
-      t.equal assets.custom.a, 'AAA'
-      t.equal assets.custom.b, undefined
-      bundleB.load()
-    .then ->
-      t.equal assets.custom.b, 'BBB'
-    .fin ->
-      t.equal assets.custom.a, 'AAA'
-      t.equal assets.custom.b, 'BBB'
+    bundle.load().fin ->
+      t.equal notLoaded.length, 0
       t.end()
