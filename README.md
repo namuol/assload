@@ -99,6 +99,10 @@ assets.use({
 });
 ```
 
+Some existing loaders:
+
+- [assload-image](http://github.com/gitsubio/assload-image)
+
 See also: [Create a custom loader](#create-a-custom-loader)
 
 ### Create a bundle of assets to load
@@ -112,7 +116,7 @@ var bundle = assets.bundle({
   sounds: {
     quack: ['quack.ogg', 'quack.mp3', 'quack.wav']
   }
-})
+});
 ```
 
 ### Load a bundle of assets
@@ -143,7 +147,7 @@ bundle = assets.bundle({
   }
 });
 
-bundle.load(function () {
+bundle.load().then(function () {
   console.log('Player:', assets.images.player); // Player: <img src='player.png' />
 });
 ```
@@ -209,6 +213,8 @@ assets.use({
 > 
 > > **`progress`**
 > > Value from 0 to 1 representing the percentage of the asset that has loaded.
+
+For a simple example, see [how assload-image is written](https://github.com/gitsubio/assload-image/blob/master/index.coffee).
 
 ## License
 
