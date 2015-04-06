@@ -11,15 +11,18 @@
   assload = function() {
     var AssetBundle, AssetManager, load, loaders, manager;
     load = function(emitter, allAssets) {
-      var all, assets, complete, name, type, whatToLoad, _fn;
+      var all, assets, complete, deferred, loadedAssets, name, type, whatToLoad, _fn;
+      deferred = Q.defer();
       all = [];
       complete = 0;
+      loadedAssets = {};
       for (type in allAssets) {
         if (!__hasProp.call(allAssets, type)) continue;
         assets = allAssets[type];
         if (loaders[type] == null) {
-          return Q.reject(new Error("No loader specified for type '" + type + "'. Provide one with assets.use(...)."));
+          return Q.reject(new Error("No loader specified for type '" + type + "'. Provide one with loader.use({'" + type + "': function () {...}})."));
         }
+        loadedAssets[type] = {};
         _fn = (function(_this) {
           return function(name, whatToLoad) {
             var notify, promise, reject, resolve, _ref;
@@ -33,7 +36,7 @@
                 amount: amount
               });
             }).then(function(asset) {
-              manager[type][name] = asset;
+              loadedAssets[type][name] = asset;
               complete += 1;
               emitter.emit('asset.progress', {
                 type: type,
@@ -59,7 +62,12 @@
           _fn(name, whatToLoad);
         }
       }
-      return Q.all(all);
+      Q.all(all).then(function() {
+        deferred.resolve(loadedAssets);
+      })["catch"](function(err) {
+        deferred.reject(err);
+      });
+      return deferred.promise;
     };
     AssetBundle = (function(_super) {
       __extends(AssetBundle, _super);

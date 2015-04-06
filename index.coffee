@@ -3,13 +3,18 @@ Q = require 'q'
 
 assload = ->
   load = (emitter, allAssets) ->
+    deferred = Q.defer();
+
     all = []
     complete = 0
+    loadedAssets = {}
 
     for own type,assets of allAssets
       if not loaders[type]?
-        return Q.reject new Error "No loader specified for type '#{type}'. Provide one with assets.use(...)."
-        
+        return Q.reject new Error "No loader specified for type '#{type}'. Provide one with loader.use({'#{type}': function () {...}})."
+
+      loadedAssets[type] = {}
+
       for own name,whatToLoad of assets
         do (name, whatToLoad) =>
           {resolve, reject, notify, promise} = Q.defer()
@@ -23,7 +28,7 @@ assload = ->
               params: whatToLoad
               amount: amount
           .then (asset) =>
-            manager[type][name] = asset
+            loadedAssets[type][name] = asset
             complete += 1
             
             emitter.emit 'asset.progress',
@@ -42,7 +47,15 @@ assload = ->
 
           all.push promise
 
-    return Q.all all
+
+    Q.all(all).then ->
+      deferred.resolve loadedAssets
+      return
+    .catch (err) ->
+      deferred.reject err
+      return
+
+    return deferred.promise
 
   class AssetBundle extends EventEmitter
     constructor: (@allAssets) ->

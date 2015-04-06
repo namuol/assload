@@ -1,6 +1,6 @@
 {
   "name": "assload",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Modular, extensible asset manager with preloading capabilities.",
   "main": "index.js",
   "scripts": {

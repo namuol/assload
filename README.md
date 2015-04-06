@@ -12,21 +12,21 @@ Modular, extensible asset manager with preloading capabilities.
 var assload = require('assload'),
     loadImages = require('assload-image'),
     loadAudio = require('assload-audio'),
-    assets, loader, music;
+    loader, loader, music;
 
 // Create a new asset manager:
-assets = assload();
+loader = assload();
 
 // Configure the asset manager to use specific loaders
 //  for different asset types
-assets.use({
+loader.use({
   images: loadImages(),
   sounds: loadAudio({preload: 'full'}),
   music: loadAudio()
 });
 
 // Create a bundle for our game's essential assets:
-essentials = assets.bundle({
+essentials = loader.bundle({
   images: {
     bacon: 'bacon.png',
     eggs: 'eggs.jpg'
@@ -37,7 +37,7 @@ essentials = assets.bundle({
 });
 
 // Create a different bundle for non-essential background music:
-backgroundMusic = assets.bundle({
+backgroundMusic = loader.bundle({
   music: {
     level1: ['level1.ogg', 'level1.mp3', 'level1.m4a'],
     battle: ['battle.ogg', 'battle.mp3', 'battle.m4a']
@@ -55,17 +55,17 @@ essentials.on('asset.complete', function (info) {
 });
 
 // Load the essentials first:
-essentials.load().then(function () {
+essentials.load().then(function (assets) {
   console.log('Bacon:', assets.images.bacon); // Bacon: <img src='bacon.png' />
   console.log('Eggs:', assets.images.eggs);   // Eggs: <img src='eggs.jpg' />
   console.log('Quack:', assets.sounds.quack); // Quack: <audio src='quack.ogg' />
-}).then(function () {
+
   // The important stuff loaded, now start the game...
   // mainLoop() or whatever you use...
 
   // ...and now load our music in the background
   return backgroundMusic.load();
-}).done(function () {
+}).then(function (assets) {
   // Now the background music has loaded, go ahead and play it:
   assets.music.level1.play();
 }).catch(function (err) {
@@ -82,7 +82,7 @@ var assload = require('assload');
 ### Create a new asset manager
 
 ```js
-var assets = assload();
+var loader = assload();
 ```
 
 ### Configure an asset manager to load specific asset types
@@ -92,7 +92,7 @@ Assload knows nothing about how to load specific types of assets.
 You must supply a loader function for any type of asset you wish to load.
 
 ```js
-assets.use({
+loader.use({
   images: loadImages(),
   sounds: loadAudio(),
   foobars: function (whatToLoad, resolve, reject, notify) { /* ... */ }
@@ -108,7 +108,7 @@ See also: [Create a custom loader](#create-a-custom-loader)
 ### Create a bundle of assets to load
 
 ```js
-var bundle = assets.bundle({
+var bundle = loader.bundle({
   images: {
     bacon: 'bacon.png',
     eggs: 'eggs.jpg'
@@ -122,7 +122,7 @@ var bundle = assets.bundle({
 ### Load a bundle of assets
 
 ```js
-bundle.load().then(function () {
+bundle.load().then(function (assets) {
   console.log('All assets have been loaded!');
 }, function (err) {
   console.error(err);
@@ -141,13 +141,13 @@ Prior to loading, the `assets.<type>.<name>` is undefined.
 For example:
 
 ```js
-bundle = assets.bundle({
+bundle = loader.bundle({
   images: {
     player: 'player.png'
   }
 });
 
-bundle.load().then(function () {
+bundle.load().then(function (assets) {
   console.log('Player:', assets.images.player); // Player: <img src='player.png' />
 });
 ```
@@ -186,7 +186,7 @@ bundle.on('asset.complete', function (info) {
 Loader functions take on the following format:
 
 ```js
-assets.use({
+loader.use({
   custom: function (whatToLoad, resolve, reject, notify) {
     // load the asset here
   }
@@ -194,7 +194,7 @@ assets.use({
 ```
 
 > **`whatToLoad`**
-> A value passed from `assets.load(...)`; this is usually a filename/uri, but can be any value.
+> A value passed from `loader.load(...)`; this is usually a filename/uri, but can be any value.
 
 > **`resolve(asset)`**
 > A function to call when the asset has successfully loaded.

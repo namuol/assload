@@ -16,21 +16,21 @@ describe 'assload', (it) ->
     t.end()
 
   it 'should return an object that has .bundle defined', (t) ->
-    assets = assload()
-    t.true typeof assets?.bundle is 'function'
+    loader = assload()
+    t.true typeof loader?.bundle is 'function'
     t.end()
 
   it 'should return a promise when bundle().load is called', (t) ->
-    assets = assload()
-    t.true Q.isPromise assets.bundle().load()
+    loader = assload()
+    t.true Q.isPromise loader.bundle().load()
     t.end()
 
   it 'should fail when attempting to load unspecified asset types', (t) ->
-    assets = assload()
+    loader = assload()
     
     failed = false
 
-    assets.bundle
+    loader.bundle
       unspecified:
         test: 'unspecified'
     .load().catch (err) ->
@@ -40,42 +40,42 @@ describe 'assload', (it) ->
       t.end()
 
   it 'should succeed when loading an asset type specified by .use', (t) ->
-    assets = assload()
+    loader = assload()
 
     data =
       test: 42
 
-    assets.use
+    loader.use
       custom: (name, resolve) ->
         resolve data[name]
     
-    assets.bundle
+    loader.bundle
       custom:
         test: 'test'
     .load()
-    .fin ->
+    .then (assets) ->
       t.equal assets.custom.test, data.test
       t.end()
 
   it 'should be able to load multiple assets', (t) ->
-    assets = assload()
+    loader = assload()
 
     data =
       'a.custom': 'AAA'
       'b.custom': 'BBB'
       'c.custom': 'CCC'
 
-    assets.use
+    loader.use
       custom: (name, resolve) ->
         resolve data[name]
     
-    assets.bundle
+    loader.bundle
       custom:
         a: 'a.custom'
         b: 'b.custom'
         c: 'c.custom'
     .load()
-    .fin ->
+    .then (assets) ->
       t.deepEqual assets.custom,
         a: 'AAA'
         b: 'BBB'
@@ -83,14 +83,14 @@ describe 'assload', (it) ->
       t.end()
 
   it 'should emit asset.complete once for each asset that loads', (t) ->
-    assets = assload()
+    loader = assload()
 
     data =
       'a.custom': 'AAA'
       'b.custom': 'BBB'
       'c.custom': 'CCC'
 
-    assets.use
+    loader.use
       custom: (name, resolve, reject) ->
         resolve data[name]
     
@@ -98,7 +98,7 @@ describe 'assload', (it) ->
     
     notLoaded = ['a', 'b', 'c']
 
-    bundle = assets.bundle
+    bundle = loader.bundle
       custom:
         a: 'a.custom'
         b: 'b.custom'
@@ -119,7 +119,7 @@ describe 'assload', (it) ->
       t.end()
 
   it 'should emit asset.progress whenever a loader calls a `notify`', (t) ->
-    assets = assload()
+    loader = assload()
 
     data =
       a: 'AAA'
@@ -128,7 +128,7 @@ describe 'assload', (it) ->
 
     notLoaded = ['a', 'b', 'c']
 
-    assets.use
+    loader.use
       custom: (name, resolve, reject, notify) ->
         for i in [1...3]
           do (i) ->
@@ -140,7 +140,7 @@ describe 'assload', (it) ->
           resolve data[name]
         , 4
     
-    bundle = assets.bundle
+    bundle = loader.bundle
       custom:
         a: 'a.custom'
         b: 'b.custom'
