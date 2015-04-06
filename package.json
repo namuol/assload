@@ -24,13 +24,13 @@
   },
   "homepage": "https://github.com/gitsubio/assload",
   "devDependencies": {
-    "browserify": "^6.0.2",
+    "browserify": "^9.0.7",
     "coffee-script": "^1.8.0",
     "coverify": "^1.0.7",
-    "lodash": "^2.4.1",
-    "tap": "^0.4.12",
-    "tap-difflet": "^0.1.0",
-    "tape": "^3.0.0"
+    "lodash": "^3.6.0",
+    "tap": "^0.7.1",
+    "tap-difflet": "^0.3.0",
+    "tape": "^4.0.0"
   },
   "dependencies": {
     "q": "^1.0.1"
